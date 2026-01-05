@@ -24,7 +24,16 @@ class DashboardController extends Controller
 
     private function clientDashboard()
     {
-        $client = auth()->user()->client;
+        $user = auth()->user();
+        $client = $user->client;
+
+        // If client record doesn't exist, create it
+        if (!$client) {
+            $client = Client::create([
+                'user_id' => $user->id,
+                'preferred_contact' => 'email',
+            ]);
+        }
 
         $stats = [
             'total_pets' => $client->pets()->count(),
