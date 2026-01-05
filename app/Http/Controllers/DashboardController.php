@@ -19,7 +19,73 @@ class DashboardController extends Controller
             return $this->clientDashboard();
         }
 
+        if ($user->isAdmin()) {
+            return $this->adminDashboard();
+        }
+
         return $this->staffDashboard();
+    }
+
+    private function adminDashboard()
+    {
+        $stats = [
+            'total_clients' => Client::count(),
+            'total_pets' => Pet::count(),
+            'total_appointments' => Appointment::count(),
+            'total_revenue' => Invoice::where('status', 'paid')->sum('total'),
+            'pending_invoices_count' => Invoice::whereIn('status', ['draft', 'sent'])->count(),
+            'pending_invoices_amount' => Invoice::whereIn('status', ['draft', 'sent'])->sum('total'),
+            'today_appointments' => Appointment::whereDate('scheduled_at', today())->count(),
+            'this_month_revenue' => Invoice::where('status', 'paid')
+                ->whereMonth('paid_at', now()->month)
+                ->sum('total'),
+        ];
+
+        // Revenue trend (last 6 months)
+        $revenue_trend = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $revenue_trend[] = [
+                'month' => $date->format('M Y'),
+                'revenue' => Invoice::where('status', 'paid')
+                    ->whereYear('paid_at', $date->year)
+                    ->whereMonth('paid_at', $date->month)
+                    ->sum('total')
+            ];
+        }
+
+        $todays_appointments = Appointment::with(['client.user', 'pet', 'service', 'staff.user'])
+            ->whereDate('scheduled_at', today())
+            ->orderBy('scheduled_at')
+            ->get();
+
+        $upcoming_appointments = Appointment::with(['client.user', 'pet', 'service', 'staff.user'])
+            ->where('scheduled_at', '>', now())
+            ->where('scheduled_at', '<', now()->addDays(7))
+            ->orderBy('scheduled_at')
+            ->limit(10)
+            ->get();
+
+        $recent_clients = Client::with('user')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        $overdue_invoices = Invoice::with('client.user')
+            ->where('status', '!=', 'paid')
+            ->where('due_date', '<', now())
+            ->orderBy('due_date')
+            ->limit(10)
+            ->get();
+
+        return Inertia::render('Dashboard/AdminDashboard', compact(
+            'stats',
+            'revenue_trend',
+            'todays_appointments',
+            'upcoming_appointments',
+            'recent_clients',
+            'overdue_invoices'
+        ));
     }
 
     private function clientDashboard()
