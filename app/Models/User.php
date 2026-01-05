@@ -79,4 +79,19 @@ class User extends Authenticatable
     {
         return $this->role === 'client';
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Automatically create client/staff records when user is created
+        static::created(function ($user) {
+            if ($user->role === 'client' && !$user->client) {
+                Client::create([
+                    'user_id' => $user->id,
+                    'preferred_contact' => 'email',
+                ]);
+            }
+        });
+    }
 }
