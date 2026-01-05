@@ -6,21 +6,79 @@ Before starting, ensure you have:
 - ✅ PHP 8.2 or higher: `php -v`
 - ✅ Composer: `composer --version`
 - ✅ Node.js 18+: `node -v`
-- ✅ MySQL 8.0+: `mysql --version`
+- ✅ Database: MySQL 8.0+ OR SQLite (with PHP extensions)
+
+**IMPORTANT:** You need PHP database extensions:
+```bash
+# Check if installed
+php -m | grep -i pdo
+php -m | grep -i sqlite    # For SQLite
+php -m | grep -i mysql     # For MySQL
+
+# Install if missing (Ubuntu/Debian)
+sudo apt-get install php8.2-sqlite3 php8.2-mysql
+```
 
 ## Step-by-Step Setup
 
 ### 1. Database Configuration
 
-Create the database:
+**Choose ONE option:**
+
+#### Option A: SQLite (Easiest - Recommended for Testing)
+
+1. Install PHP SQLite extension (if not installed):
+```bash
+# Ubuntu/Debian
+sudo apt-get install php8.2-sqlite3
+
+# macOS - usually included
+# Windows - enable in php.ini
+```
+
+2. Create database file:
+```bash
+touch database/database.sqlite
+```
+
+3. Configure `.env`:
+```env
+DB_CONNECTION=sqlite
+# Comment out MySQL settings
+```
+
+4. Skip to step 3 (Install Dependencies)
+
+#### Option B: MySQL (For Production)
+
+1. Start MySQL service:
+```bash
+# Ubuntu/Debian
+sudo systemctl start mysql
+
+# macOS
+brew services start mysql
+```
+
+2. Create database:
 ```bash
 mysql -u root -p
 ```
 
-Then run:
+3. Run SQL:
 ```sql
 CREATE DATABASE petcare_crm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 EXIT;
+```
+
+4. Configure `.env`:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=petcare_crm
+DB_USERNAME=root
+DB_PASSWORD=your_password
 ```
 
 ### 2. Environment Setup
