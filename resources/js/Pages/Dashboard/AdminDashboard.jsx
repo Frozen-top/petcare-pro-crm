@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
 
 export default function AdminDashboard({
@@ -10,7 +10,7 @@ export default function AdminDashboard({
     overdue_invoices
 }) {
     return (
-        <AuthenticatedLayout
+        <DashboardLayout
             header={
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
@@ -363,6 +363,6 @@ export default function AdminDashboard({
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </DashboardLayout>
     );
 }

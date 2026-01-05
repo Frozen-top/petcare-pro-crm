@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { useEffect } from 'react';
 
@@ -29,7 +29,7 @@ export default function Settings() {
     };
 
     return (
-        <AuthenticatedLayout
+        <DashboardLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
                     App Settings
@@ -247,6 +247,6 @@ export default function Settings() {
                     animation: fade-in 0.3s ease-out;
                 }
             `}</style>
-        </AuthenticatedLayout>
+        </DashboardLayout>
     );
 }
