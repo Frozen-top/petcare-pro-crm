@@ -77,6 +77,14 @@ Route::middleware('auth')->group(function () {
     // Admin routes
     Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/settings', fn() => Inertia::render('Admin/Settings'))->name('settings');
+
+        Route::get('/settings/current', function() {
+            return response()->json([
+                'trial_days' => \App\Models\AppSetting::getTrialDays(),
+                'monthly_price' => \App\Models\AppSetting::getMonthlyPrice(),
+            ]);
+        });
+
         Route::post('/settings', function(\Illuminate\Http\Request $request) {
             $validated = $request->validate([
                 'trial_days' => 'required|integer|min:1|max:90',
